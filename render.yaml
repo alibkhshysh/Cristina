@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: CristinaPiccola
+    runtime: docker
+    plan: free
+    branch: main
+    rootDir: mypiccola
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /Cristina
+    autoDeploy: true

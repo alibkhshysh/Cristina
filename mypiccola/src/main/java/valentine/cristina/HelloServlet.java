@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "HelloServlet", urlPatterns = {"/Cristina", "/crisitina"})
+@WebServlet(name = "HelloServlet", urlPatterns = {"/Cristina", "/cristina", "/crisitina"})
 public class HelloServlet extends HttpServlet {
 
     @Override
@@ -378,9 +378,14 @@ public class HelloServlet extends HttpServlet {
                                 document.body.appendChild(sticker);
                             }
 
+                            function clearNoStickers() {
+                                document.querySelectorAll(".no-sticker").forEach((sticker) => sticker.remove());
+                            }
+
                             yesBtn.addEventListener("click", () => {
                                 reply.textContent = "";
                                 reply.className = "reply";
+                                clearNoStickers();
                                 card.style.display = "none";
                                 yesOnlyOverlay.classList.add("show");
                                 startCelebration();
@@ -402,7 +407,7 @@ public class HelloServlet extends HttpServlet {
                                 reply.className = "reply no";
 
                                 noBtn.style.position = "fixed";
-                                noBtn.style.zIndex = "1000";
+                                noBtn.style.zIndex = "3200";
                                 noBtn.style.transform = "none";
 
                                 const buttonRect = noBtn.getBoundingClientRect();
