@@ -275,6 +275,8 @@ public class HelloServlet extends HttpServlet {
                             const colors = ["#ff4d6d", "#ffd166", "#06d6a0", "#4cc9f0", "#ff85a1", "#f48c06"];
                             const celebrationEmojis = ["😘", "😍"];
                             const stickerSrc = "IMAge.png";
+                            const stickerProbe = new Image();
+                            stickerProbe.src = stickerSrc;
                             const noMessages = [
                                 "My love, are you sure?!",
                                 "My looooooveeeee?! 😨",
@@ -356,19 +358,80 @@ public class HelloServlet extends HttpServlet {
                                 }, 220);
                             }
 
+                            function rectsOverlap(a, b) {
+                                return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+                            }
+
+                            function getExcludedStickerRects() {
+                                const margin = 14;
+                                const elements = [yesBtn, noBtn, reply];
+                                const excluded = [];
+
+                                for (const element of elements) {
+                                    if (!element || !element.isConnected) {
+                                        continue;
+                                    }
+
+                                    const rect = element.getBoundingClientRect();
+                                    if (rect.width <= 0 || rect.height <= 0) {
+                                        continue;
+                                    }
+
+                                    excluded.push({
+                                        left: rect.left - margin,
+                                        top: rect.top - margin,
+                                        right: rect.right + margin,
+                                        bottom: rect.bottom + margin
+                                    });
+                                }
+
+                                return excluded;
+                            }
+
                             function dropNoSticker() {
                                 const sticker = document.createElement("img");
                                 const stickerSize = 105 + Math.random() * 95;
+                                const aspectRatio = (stickerProbe.naturalWidth > 0 && stickerProbe.naturalHeight > 0)
+                                    ? (stickerProbe.naturalHeight / stickerProbe.naturalWidth)
+                                    : 1.3;
+                                const stickerHeight = stickerSize * aspectRatio;
+                                const excludedRects = getExcludedStickerRects();
+                                let randomX = 0;
+                                let randomY = 0;
+                                let placed = false;
 
                                 sticker.className = "no-sticker";
                                 sticker.src = stickerSrc;
                                 sticker.alt = "Sticker";
                                 sticker.style.width = stickerSize + "px";
 
-                                const maxX = Math.max(0, window.innerWidth - stickerSize);
-                                const maxY = Math.max(0, window.innerHeight - stickerSize);
-                                const randomX = Math.floor(Math.random() * (maxX + 1));
-                                const randomY = Math.floor(Math.random() * (maxY + 1));
+                                for (let attempt = 0; attempt < 120; attempt++) {
+                                    const maxX = Math.max(0, window.innerWidth - stickerSize);
+                                    const maxY = Math.max(0, window.innerHeight - stickerHeight);
+                                    const candidateX = Math.floor(Math.random() * (maxX + 1));
+                                    const candidateY = Math.floor(Math.random() * (maxY + 1));
+                                    const candidateRect = {
+                                        left: candidateX,
+                                        top: candidateY,
+                                        right: candidateX + stickerSize,
+                                        bottom: candidateY + stickerHeight
+                                    };
+
+                                    if (!excludedRects.some((rect) => rectsOverlap(candidateRect, rect))) {
+                                        randomX = candidateX;
+                                        randomY = candidateY;
+                                        placed = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!placed) {
+                                    const maxX = Math.max(0, window.innerWidth - stickerSize);
+                                    const maxY = Math.max(0, window.innerHeight - stickerHeight);
+                                    randomX = Math.floor(Math.random() * (maxX + 1));
+                                    randomY = Math.floor(Math.random() * (maxY + 1));
+                                }
+
                                 const randomRotation = -20 + (Math.random() * 40);
 
                                 sticker.style.left = randomX + "px";
@@ -393,11 +456,11 @@ public class HelloServlet extends HttpServlet {
 
                             noBtn.addEventListener("click", () => {
                                 noClicks += 1;
-                                dropNoSticker();
 
                                 if (noClicks >= 10) {
                                     reply.textContent = "My  love , you cant run , You are Mine . M - I - N - E";
                                     reply.className = "reply no";
+                                    dropNoSticker();
                                     noBtn.remove();
                                     return;
                                 }
@@ -417,6 +480,8 @@ public class HelloServlet extends HttpServlet {
                                 const randomY = Math.floor(Math.random() * (maxY + 1));
                                 noBtn.style.left = randomX + "px";
                                 noBtn.style.top = randomY + "px";
+
+                                dropNoSticker();
                             });
                         })();
                     </script>
