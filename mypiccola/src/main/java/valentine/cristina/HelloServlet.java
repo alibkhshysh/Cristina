@@ -248,6 +248,7 @@ public class HelloServlet extends HttpServlet {
                     </style>
                 </head>
                 <body>
+                    <audio id="bgMusic" src="sunshine-cute-baby-remix-made-with-Voicemod.mp3" autoplay loop preload="auto"></audio>
                     <main class="card">
                         <img id="heroGif" class="hero-gif" src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3d5YXZjemh2emo4ZXh2b3hkN3Vvcm5pbnNsMGxmb2h6dmV5MTBhbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g0ou7QvBa5MSexh8jv/giphy.gif" alt="Valentine gif">
                         <h1>Cristina, will you Always be my Valentine?</h1>
@@ -268,6 +269,7 @@ public class HelloServlet extends HttpServlet {
                             const yesBtn = document.getElementById("yesBtn");
                             const noBtn = document.getElementById("noBtn");
                             const reply = document.getElementById("reply");
+                            const bgMusic = document.getElementById("bgMusic");
                             const card = document.querySelector(".card");
                             const yesOnlyOverlay = document.getElementById("yesOnlyOverlay");
                             let noClicks = 0;
@@ -288,6 +290,41 @@ public class HelloServlet extends HttpServlet {
                                 "Maybe try cleaning your glasses.",
                                 "My love, first go drink a glass of water."
                             ];
+
+                            function keepMusicPlaying() {
+                                if (!bgMusic) {
+                                    return;
+                                }
+
+                                const playPromise = bgMusic.play();
+                                if (playPromise && typeof playPromise.catch === "function") {
+                                    playPromise.catch(() => {});
+                                }
+                            }
+
+                            if (bgMusic) {
+                                keepMusicPlaying();
+
+                                const unlockAudio = () => {
+                                    keepMusicPlaying();
+                                };
+
+                                document.addEventListener("click", unlockAudio, {once: true});
+                                document.addEventListener("touchstart", unlockAudio, {once: true});
+                                document.addEventListener("keydown", unlockAudio, {once: true});
+
+                                bgMusic.addEventListener("pause", () => {
+                                    if (!document.hidden) {
+                                        keepMusicPlaying();
+                                    }
+                                });
+
+                                document.addEventListener("visibilitychange", () => {
+                                    if (!document.hidden) {
+                                        keepMusicPlaying();
+                                    }
+                                });
+                            }
 
                             function createExplosionAt(x, y, color) {
                                 const fragments = 10;
