@@ -274,7 +274,7 @@ public class HelloServlet extends HttpServlet {
                             let celebrationTimer = null;
                             const colors = ["#ff4d6d", "#ffd166", "#06d6a0", "#4cc9f0", "#ff85a1", "#f48c06"];
                             const celebrationEmojis = ["😘", "😍"];
-                            const stickerSrc = "IMAge.png";
+                            const stickerSrc = "New.png";
                             const stickerProbe = new Image();
                             stickerProbe.src = stickerSrc;
                             const noMessages = [
